@@ -1,88 +1,441 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qantica_Tabla_comparativa</title>
-    <!-- Include Tailwind CSS CDN for a modern and fast style -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, X, ArrowRight, Instagram, Mail, Phone, MapPin, ChevronDown, ExternalLink } from 'lucide-react';
+
+const WhiteCactusWeb = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [visibleSections, setVisibleSections] = useState({});
+  
+  // Observer para animaciones al hacer scroll
+  const sectionRefs = useRef({});
+  
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setVisibleSections(prev => ({ ...prev, [entry.target.id]: true }));
         }
-    </style>
-</head>
-<body class="bg-black flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-12">
+      });
+    }, { threshold: 0.15 });
 
-    <!-- Main container for the entire page content -->
-    <div class="max-w-7xl mx-auto w-full">
-        <!-- Title and description section -->
-        <header class="text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl font-extrabold text-yellow-400 mb-4">MODELOS DE GUIÓN CON IA</h1>
-            <p class="text-lg text-gray-300 max-w-2xl mx-auto">
-                Una comparación básica para comprender las diferencias entre los modelos de guion con IA.
-            </p>
-        </header>
+    Object.values(sectionRefs.current).forEach(el => {
+      if (el) observer.observe(el);
+    });
 
-        <!-- Container for the table with horizontal scroll on small screens -->
-        <div class="overflow-x-auto rounded-3xl shadow-lg border border-gray-700">
-            <table class="w-full text-left table-auto">
-                <!-- Table header -->
-                <thead class="bg-gray-900">
-                    <tr class="text-yellow-400 text-lg">
-                        <th scope="col" class="px-6 py-4 font-bold rounded-tl-3xl">Característica</th>
-                        <th scope="col" class="px-6 py-4 font-bold">Plataformas Tradicionales de IA</th>
-                        <th scope="col" class="px-6 py-4 font-bold rounded-tr-3xl">QANTICA</th>
-                    </tr>
-                </thead>
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
+  }, []);
 
-                <!-- Table body -->
-                <tbody class="divide-y divide-gray-700">
-                    <!-- Row for "AI Role" -->
-                    <tr class="bg-gray-800">
-                        <td class="px-6 py-4 text-yellow-400 font-semibold">Rol de la IA</td>
-                        <td class="px-6 py-4 text-gray-300">Genera contenido automáticamente y lo entrega como “resultado final”.</td>
-                        <td class="px-6 py-4 text-gray-300">Funciona como un asistente experto del creador, guiando y estimulando el pensamiento creativo del guionista.</td>
-                    </tr>
-                    
-                    <!-- Row for "Human Focus" -->
-                    <tr class="bg-gray-900">
-                        <td class="px-6 py-4 text-yellow-400 font-semibold">Protagonismo Humano</td>
-                        <td class="px-6 py-4 text-gray-300">El humano recibe texto ya hecho → dependencia de la IA.</td>
-                        <td class="px-6 py-4 text-gray-300">El guionista es el centro: la IA hace preguntas, establece un orden y acompaña el proceso.</td>
-                    </tr>
-                    
-                    <!-- Row for "Creativity" -->
-                    <tr class="bg-gray-800">
-                        <td class="px-6 py-4 text-yellow-400 font-semibold">Creatividad</td>
-                        <td class="px-6 py-4 text-gray-300">Riesgo de homogeneidad y repetición de patrones de IA.</td>
-                        <td class="px-6 py-4 text-gray-300">Originalidad y autenticidad, porque el talento surge del autor apoyado por la IA.</td>
-                    </tr>
-                    
-                    <!-- Row for "Intellectual Property" -->
-                    <tr class="bg-gray-900">
-                        <td class="px-6 py-4 text-yellow-400 font-semibold">Propiedad Intelectual</td>
-                        <td class="px-6 py-4 text-gray-300">Ambigüedad: ¿De quién es el texto generado por IA?</td>
-                        <td class="px-6 py-4 text-gray-300">100% del guionista: la IA no “crea” sino que apoya y potencia.</td>
-                    </tr>
-                    
-                    <!-- Row for "Added Value" -->
-                    <tr class="bg-gray-800">
-                        <td class="px-6 py-4 text-yellow-400 font-semibold rounded-bl-3xl">Valor Agregado</td>
-                        <td class="px-6 py-4 text-gray-300">Ahorro de tiempo, pero sacrificio de voz propia.</td>
-                        <td class="px-6 py-4 text-gray-300 rounded-br-3xl">Desarrollo de talento humano con impacto real en la industria creativa. Es también un entorno educativo.</td>
-                    </tr>
-                </tbody>
-            </table>
+  const navigation = [
+    { name: 'Studio', href: '#about' },
+    { name: 'Servicios', href: '#services' },
+    { name: 'Proyectos', href: '#projects' },
+    { name: 'Proceso', href: '#process' },
+    { name: 'Contacto', href: '#contact' },
+  ];
+
+  const categories = ['Todos', 'Residencial', 'Comercial', 'Exterior', 'Reformas'];
+
+  const projects = [
+    {
+      id: 1,
+      title: "ALBUS PREMIUM",
+      subtitle: "Carnicería Boutique",
+      category: "Comercial",
+      image: "https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=2070&auto=format&fit=crop", // Modern dark interior
+      desc: "Ruptura con la estética tradicional. Tonos azules profundos, madera de nogal y cristal."
+    },
+    {
+      id: 2,
+      title: "LA FLORESTA",
+      subtitle: "Vivienda Unifamiliar",
+      category: "Residencial",
+      image: "https://images.unsplash.com/photo-1600210492493-0946911123ea?q=80&w=1000&auto=format&fit=crop", // Modern bright living room
+      desc: "Reorganización de planta para potenciar la luz natural y la fluidez espacial."
+    },
+    {
+      id: 3,
+      title: "VILLA MUSHU",
+      subtitle: "Oasis Exterior",
+      category: "Exterior",
+      image: "https://images.unsplash.com/photo-1628744876497-eb30460be9f6?q=80&w=2070&auto=format&fit=crop", // Minimalist patio
+      desc: "Conexión in-out. Materiales naturales que envejecen con dignidad bajo el sol."
+    },
+    {
+      id: 4,
+      title: "LOFT POBLENOU",
+      subtitle: "Reforma Integral",
+      category: "Residencial",
+      image: "https://images.unsplash.com/photo-1615529182904-14819c35db37?q=80&w=2070&auto=format&fit=crop", // Loft industrial chic
+      desc: "Recuperación de elementos originales industriales con toque contemporáneo."
+    },
+    {
+      id: 5,
+      title: "OFICINAS CENTRO",
+      subtitle: "Espacio de Trabajo",
+      category: "Comercial",
+      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop", // Clean office
+      desc: "Funcionalidad y acústica sin sacrificar la calidez."
+    },
+    {
+      id: 6,
+      title: "ÁTICO VIA AUGUSTA",
+      subtitle: "Reforma de Lujo",
+      category: "Reformas",
+      image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=1000&auto=format&fit=crop", // Luxury kitchen
+      desc: "Intervención integral en cocina y suite principal. Minimalismo cálido."
+    }
+  ];
+
+  const filteredProjects = activeCategory === 'Todos' 
+    ? projects 
+    : projects.filter(p => p.category === activeCategory);
+
+  return (
+    <div className="min-h-screen bg-white text-neutral-900 font-sans selection:bg-black selection:text-white overflow-x-hidden">
+      
+      {/* --- MENÚ DE NAVEGACIÓN --- */}
+      <nav className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${scrolled ? 'py-4 bg-white/90 backdrop-blur-md border-b border-neutral-100' : 'py-8 bg-transparent'}`}>
+        <div className="container mx-auto px-6 md:px-12 flex justify-between items-center">
+          <a href="#" className={`text-xl md:text-2xl tracking-[0.25em] font-light z-50 transition-colors duration-300 ${isMenuOpen ? 'text-white' : 'text-black'}`}>
+            WHITE CACTUS <span className="font-bold">BCN</span>
+          </a>
+
+          {/* Botón Hamburguesa */}
+          <button 
+            className="group flex flex-col items-end gap-1.5 z-50 mix-blend-difference"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            <span className={`h-[2px] bg-white transition-all duration-300 ${isMenuOpen ? 'w-8 rotate-45 translate-y-2' : 'w-8 bg-black'}`}></span>
+            <span className={`h-[2px] bg-white transition-all duration-300 ${isMenuOpen ? 'opacity-0' : 'w-6 bg-black group-hover:w-8'}`}></span>
+            <span className={`h-[2px] bg-white transition-all duration-300 ${isMenuOpen ? 'w-8 -rotate-45 -translate-y-2' : 'w-4 bg-black group-hover:w-8'}`}></span>
+          </button>
+        </div>
+      </nav>
+
+      {/* --- OVERLAY MENÚ COMPLETO --- */}
+      <div className={`fixed inset-0 bg-black z-40 transition-transform duration-700 ease-[cubic-bezier(0.77,0,0.175,1)] ${isMenuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+        <div className="container mx-auto h-full px-6 md:px-12 flex flex-col justify-center relative">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end h-3/4 pb-20">
+            {/* Links */}
+            <div className="flex flex-col space-y-6">
+              {navigation.map((item, idx) => (
+                <a 
+                  key={item.name} 
+                  href={item.href} 
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`text-4xl md:text-7xl font-light text-white hover:text-neutral-400 transition-colors tracking-tighter transform translate-y-4 opacity-0 animate-slide-up`}
+                  style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'forwards' }}
+                >
+                  {item.name}
+                </a>
+              ))}
+            </div>
+
+            {/* Info Contacto Menú */}
+            <div className="mt-12 md:mt-0 text-neutral-400 font-light tracking-wide text-sm md:text-base space-y-2 text-right">
+              <p>Barcelona, España</p>
+              <a href="mailto:whitecactusbcn@gmail.com" className="block hover:text-white transition-colors">whitecactusbcn@gmail.com</a>
+              <a href="tel:+34607372983" className="block hover:text-white transition-colors">+34 607 372 983</a>
+              <div className="pt-4 flex justify-end gap-4">
+                <Instagram className="w-5 h-5 cursor-pointer hover:text-white" />
+                <Mail className="w-5 h-5 cursor-pointer hover:text-white" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- HERO SECTION --- */}
+      <header className="relative h-screen w-full overflow-hidden flex items-center justify-center">
+        <div className="absolute inset-0 bg-black">
+          <img 
+            src="https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?q=80&w=2728&auto=format&fit=crop" 
+            alt="Interior Minimalista" 
+            className="w-full h-full object-cover opacity-70 scale-105 animate-slow-zoom"
+          />
+        </div>
+        
+        <div className="relative z-10 text-center text-white px-4 mix-blend-overlay">
+          <p className="text-xs md:text-sm uppercase tracking-[0.4em] mb-6 animate-fade-in-up">Sofia Ciaglia</p>
+          <h1 className="text-5xl md:text-8xl font-light tracking-tight mb-8 leading-tight animate-fade-in-up delay-100">
+            ESPACIOS CON <br/> <span className="font-bold italic font-serif">ALMA & RIGOR</span>
+          </h1>
+          <div className="w-[1px] h-24 bg-white mx-auto mt-8 animate-grow-down delay-300"></div>
         </div>
 
-        <!-- Section for the QANTICA Method description -->
-        <div class="mt-12 p-8 bg-gray-900 rounded-3xl border border-gray-700 shadow-lg">
-            <h2 class="text-2xl font-bold text-yellow-400 mb-4">El Método QANTICA: Un Enfoque Colaborativo</h2>
-            <p class="text-gray-300 leading-relaxed">
-                QANTICA aplica un **Método Socrático**. Su IA desafía a los autores con preguntas precisas y dirigidas que los incitan a reflexionar profunda y productivamente sobre su trabajo. No genera ni reemplaza contenido ni propone escenas. A través de preguntas enfocadas en la lógica, originalidad, tono, desglose, diálogos, personajes, género y coherencia de la obra, la IA actúa como un **coach** que fuerza a los creadores a pensar, cuestiona motivaciones, detecta inconsistencias y ayuda a ordenar y enriquecer ideas – siempre con el objetivo de refinar la voz original del autor, nunca de sustituirla. Se adapta al material y a las decisiones previas, asegurando la continuidad emocional y lógica a través de ciclos de trabajo modulares y bien documentados, siguiendo una serie de pasos que llamamos el **Método**. **Blockchain** es fundamental porque nuestro contrato inteligente garantiza la trazabilidad para registrar todos los pasos y la inmutabilidad que añade legitimidad como Propiedad Intelectual (IP) original de los creadores.
-            </p>
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white animate-bounce-slow cursor-pointer" onClick={() => document.getElementById('about').scrollIntoView({behavior: 'smooth'})}>
+          <ChevronDown className="w-6 h-6 opacity-70" />
         </div>
+      </header>
+
+      {/* --- QUIÉN SOY --- */}
+      <section id="about" ref={el => sectionRefs.current['about'] = el} className={`py-32 bg-white transition-opacity duration-1000 ${visibleSections['about'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="flex flex-col lg:flex-row gap-20 items-end">
+            <div className="lg:w-1/2 relative">
+              <div className="relative z-10 overflow-hidden group">
+                 <img 
+                  src="https://images.unsplash.com/photo-1556910103-1c02745a30bf?q=80&w=2070&auto=format&fit=crop" 
+                  alt="Estudio" 
+                  className="w-full aspect-[3/4] object-cover grayscale hover:grayscale-0 transition-all duration-700 ease-in-out"
+                />
+                <div className="absolute bottom-0 left-0 bg-white p-6 md:p-8 max-w-xs shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <p className="font-serif italic text-2xl text-black">"El detalle no es solo un detalle. Es el diseño."</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="lg:w-1/2 space-y-10">
+              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-neutral-400">El Estudio</h2>
+              <div className="text-3xl md:text-5xl font-light leading-tight space-y-2">
+                <p>Interiorismo Estratégico.</p>
+                <p className="text-neutral-400">Diseño sin improvisación.</p>
+              </div>
+              <p className="text-neutral-600 text-lg leading-relaxed font-light max-w-lg">
+                Soy <strong>Sofia Ciaglia</strong>. Mi metodología fusiona la creatividad del diseño con el rigor de la dirección de obra. No solo proyecto espacios estéticos; garantizo su ejecución técnica colaborando estrechamente con arquitectos y constructores.
+              </p>
+              
+              <div className="grid grid-cols-2 gap-8 pt-8 border-t border-neutral-100">
+                <div>
+                  <h4 className="text-4xl font-light mb-2">10+</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500">Años de experiencia</p>
+                </div>
+                <div>
+                  <h4 className="text-4xl font-light mb-2">100%</h4>
+                  <p className="text-xs uppercase tracking-widest text-neutral-500">Compromiso técnico</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- PROYECTOS (INTERACTIVO) --- */}
+      <section id="projects" ref={el => sectionRefs.current['projects'] = el} className="py-32 bg-neutral-50">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-neutral-400 mb-4">Portfolio</h2>
+              <h3 className="text-4xl md:text-5xl font-light">Proyectos Recientes</h3>
+            </div>
+            
+            {/* Filtros */}
+            <div className="flex flex-wrap gap-4 md:gap-8">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`text-sm uppercase tracking-widest transition-all duration-300 pb-1 border-b ${activeCategory === cat ? 'border-black text-black' : 'border-transparent text-neutral-400 hover:text-black'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Grid de Proyectos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8">
+            {filteredProjects.map((project, index) => (
+              <div 
+                key={project.id} 
+                className="group cursor-pointer"
+              >
+                {/* Imagen con efecto flotante */}
+                <div className="relative overflow-hidden aspect-[4/5] mb-6 bg-neutral-200 shadow-sm transition-all duration-500 hover:shadow-2xl hover:-translate-y-2">
+                  <img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                     <span className="bg-white text-black px-6 py-3 text-xs uppercase tracking-widest font-bold transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">Ver Proyecto</span>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-1">{project.category}</p>
+                    <h4 className="text-xl font-light group-hover:underline decoration-1 underline-offset-4">{project.title}</h4>
+                    <p className="text-neutral-500 text-sm mt-2 line-clamp-2 hidden group-hover:block transition-all animate-fade-in">{project.desc}</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- SERVICIOS --- */}
+      <section id="services" className="py-32 bg-black text-white">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <div>
+              <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-neutral-500 mb-6">Expertise</h2>
+              <h3 className="text-4xl md:text-6xl font-light leading-tight mb-8">
+                Diseño Integral <br/> & Ejecución
+              </h3>
+              <p className="text-neutral-400 font-light text-lg max-w-md">
+                No solo diseñamos espacios bonitos. Creamos documentación técnica precisa para que la obra sea un proceso fluido, no un problema.
+              </p>
+            </div>
+
+            <div className="space-y-0 divide-y divide-neutral-800">
+              {[
+                { title: "Interiorismo & Decoración", desc: "Concepto, mobiliario y estilismo final." },
+                { title: "Planos & Distribución", desc: "Optimización de espacios y planos técnicos." },
+                { title: "Dirección de Obra", desc: "Control de ejecución, tiempos y acabados." },
+                { title: "Diseño Exterior", desc: "Paisajismo, terrazas y conexión in-out." },
+                { title: "Visualización 3D", desc: "Renders hiperrealistas para toma de decisiones." }
+              ].map((service, idx) => (
+                <div key={idx} className="py-8 group cursor-default">
+                  <div className="flex justify-between items-center">
+                    <h4 className="text-xl md:text-2xl font-light text-neutral-300 group-hover:text-white transition-colors">{service.title}</h4>
+                    <span className="text-neutral-600 group-hover:text-white transition-colors text-2xl font-thin">+</span>
+                  </div>
+                  <div className="h-0 overflow-hidden group-hover:h-auto transition-all duration-300">
+                    <p className="pt-4 text-neutral-500 font-light">{service.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- PROCESO --- */}
+      <section id="process" className="py-32 bg-white overflow-hidden">
+        <div className="container mx-auto px-6 md:px-12 text-center mb-20">
+          <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-neutral-400 mb-4">Metodología</h2>
+          <h3 className="text-4xl font-light">Cómo Trabajamos</h3>
+        </div>
+
+        <div className="container mx-auto px-6 md:px-12 relative">
+          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-neutral-200 -z-10 hidden md:block"></div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            {[
+              { step: "01", title: "Análisis", text: "Estudio de necesidades y espacio." },
+              { step: "02", title: "Diseño", text: "Propuesta creativa y técnica." },
+              { step: "03", title: "Gestión", text: "Presupuestos y planificación." },
+              { step: "04", title: "Obra", text: "Dirección y entrega llave en mano." }
+            ].map((item, i) => (
+              <div key={i} className="bg-white p-6 border border-neutral-100 shadow-lg md:shadow-none md:border-none md:bg-transparent text-center md:text-left group hover:-translate-y-2 transition-transform duration-300">
+                <div className="text-5xl md:text-7xl font-light text-neutral-100 mb-4 group-hover:text-neutral-900 transition-colors duration-500 font-serif">{item.step}</div>
+                <h4 className="text-xl font-bold mb-2">{item.title}</h4>
+                <p className="text-neutral-500 font-light text-sm">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- BANNER COLABORACIÓN --- */}
+      <section className="py-24 bg-neutral-100">
+        <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12">
+          <div className="md:w-2/3">
+            <h3 className="text-3xl font-light mb-4">¿Eres Arquitecto o Constructora?</h3>
+            <p className="text-neutral-600 font-light">
+              Aporto valor técnico y estético a tus obras. Documentación clara, menos errores y clientes más felices.
+            </p>
+          </div>
+          <a href="#contact" className="px-8 py-4 bg-black text-white text-xs font-bold uppercase tracking-widest hover:bg-neutral-800 transition-colors whitespace-nowrap">
+            Colaborar
+          </a>
+        </div>
+      </section>
+
+      {/* --- CONTACTO --- */}
+      <section id="contact" className="py-32 bg-white relative">
+        <div className="container mx-auto px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+            <div className="space-y-8">
+              <h2 className="text-6xl md:text-8xl font-light tracking-tighter">Hablemos.</h2>
+              <p className="text-xl font-light text-neutral-500 max-w-md">
+                Cada espacio tiene una historia que contar. Empecemos a escribir la tuya.
+              </p>
+              
+              <div className="space-y-4 pt-8">
+                <a href="mailto:whitecactusbcn@gmail.com" className="flex items-center gap-4 text-lg hover:translate-x-2 transition-transform duration-300">
+                  <span className="w-12 h-[1px] bg-black"></span>
+                  whitecactusbcn@gmail.com
+                </a>
+                <a href="tel:+34607372983" className="flex items-center gap-4 text-lg hover:translate-x-2 transition-transform duration-300">
+                  <span className="w-12 h-[1px] bg-black"></span>
+                  +34 607 372 983
+                </a>
+                <div className="flex items-center gap-4 text-lg text-neutral-400">
+                  <span className="w-12 h-[1px] bg-neutral-300"></span>
+                  Barcelona / Online
+                </div>
+              </div>
+            </div>
+
+            <form className="bg-white space-y-8 pt-4">
+              <div className="group relative">
+                <input type="text" placeholder="Tu Nombre" className="w-full py-4 border-b border-neutral-300 focus:border-black outline-none bg-transparent transition-colors placeholder:text-neutral-300 text-lg" />
+              </div>
+              <div className="group relative">
+                <input type="email" placeholder="Email" className="w-full py-4 border-b border-neutral-300 focus:border-black outline-none bg-transparent transition-colors placeholder:text-neutral-300 text-lg" />
+              </div>
+              <div className="group relative">
+                <textarea rows="4" placeholder="Cuéntame sobre tu proyecto..." className="w-full py-4 border-b border-neutral-300 focus:border-black outline-none bg-transparent transition-colors placeholder:text-neutral-300 text-lg resize-none"></textarea>
+              </div>
+              
+              <button className="group flex items-center gap-4 text-sm font-bold uppercase tracking-widest hover:text-neutral-600 transition-colors pt-4">
+                Enviar Mensaje
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FOOTER --- */}
+      <footer className="bg-black text-white py-12 border-t border-neutral-900">
+        <div className="container mx-auto px-6 md:px-12 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500 uppercase tracking-widest">
+          <p>&copy; 2024 White Cactus BCN</p>
+          <div className="flex gap-8 mt-4 md:mt-0">
+            <a href="#" className="hover:text-white transition-colors">Instagram</a>
+            <a href="#" className="hover:text-white transition-colors">Linkedin</a>
+            <a href="#" className="hover:text-white transition-colors">Legal</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* CSS Styles for animations */}
+      <style>{`
+        @keyframes fade-in-up {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-up {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes grow-down {
+          from { height: 0; }
+          to { height: 6rem; }
+        }
+        @keyframes slow-zoom {
+          from { transform: scale(1); }
+          to { transform: scale(1.1); }
+        }
+        .animate-fade-in-up { animation: fade-in-up 1s ease-out forwards; }
+        .animate-slide-up { animation: slide-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-grow-down { animation: grow-down 1s ease-out forwards; }
+        .animate-slow-zoom { animation: slow-zoom 20s linear infinite alternate; }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-300 { animation-delay: 0.3s; }
+      `}</style>
     </div>
-</body>
-</html>
+  );
+};
+
+export default WhiteCactusWeb;
