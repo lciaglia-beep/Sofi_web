@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#010403">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>MANTIS — Descenso 01</title>
 </head>
 <body>
@@ -47,6 +50,7 @@
     </div>
     <div id="tPause">| |</div>
   </div>
+  <div id="fsx">✕</div>
   <div id="gpumsg" class="hidden">GRÁFICOS EN RECUPERACIÓN…</div>
   <div id="rotate">GIRA EL DISPOSITIVO<br><small>mejor en horizontal</small></div>
   <div id="fade"></div>
@@ -169,6 +173,8 @@ window.addEventListener("error",function(ev){if(window.__mantisBooted)return;var
   /* --- móvil / táctil --- */
   @supports(height:100dvh){#root{height:100dvh}}
   #root{touch-action:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  #fsx{position:absolute;top:10px;left:10px;width:42px;height:42px;z-index:46;display:none;align-items:center;justify-content:center;border:1px solid rgba(130,255,173,.4);background:rgba(4,18,9,.55);color:#bfe9cc;font-size:15px;pointer-events:auto}
+  body.touch #fsx.show{display:flex}
   #gpumsg{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:60;background:rgba(0,0,0,.78);border:1px solid rgba(130,255,173,.4);color:#8affb0;padding:14px 26px;letter-spacing:2px;font-size:13px}
   #touchui{position:absolute;inset:0;z-index:13;pointer-events:none}
   #stickzone{position:absolute;left:0;bottom:0;width:44%;height:72%;pointer-events:auto}
@@ -569,6 +575,20 @@ window.addEventListener("error",function(ev){if(window.__mantisBooted)return;var
     var bs=document.querySelector("#begin small");if(bs)bs.textContent="TOCA PARA ENTRAR";
     var ct=document.querySelector(".ctrls");if(ct)ct.innerHTML='<span><b>JOYSTICK</b> izquierda: moverse</span><span><b>ARRASTRA</b> derecha: mirar</span><span><b>BOTONES</b> luz · CD · radio · aire</span><span><b>USAR</b> recoger / activar</span>';
     })();}catch(e){if(window.console)console.warn(e);}}
+
+  /* ===== PANTALLA COMPLETA (móvil): automática al primer toque, X para salir ===== */
+  var FSW={want:true};
+  function goFS(){try{var de=document.documentElement,fn=de.requestFullscreen||de.webkitRequestFullscreen;if(!document.fullscreenElement&&!document.webkitFullscreenElement&&fn){var p=fn.call(de);if(p&&p.catch)p.catch(function(){});}}catch(e){}}
+  function exitFS(){try{var fn=document.exitFullscreen||document.webkitExitFullscreen;if(fn)fn.call(document);}catch(e){}}
+  if(IS_TOUCH){(function(){
+    document.addEventListener("touchend",function(){if(FSW.want)goFS();},{passive:true});
+    var fx=$("#fsx");
+    function updFsx(){var on=!!(document.fullscreenElement||document.webkitFullscreenElement);if(fx)fx.classList.toggle("show",on);}
+    document.addEventListener("fullscreenchange",updFsx);document.addEventListener("webkitfullscreenchange",updFsx);
+    window.addEventListener("resize",updFsx);
+    function closeFS(){FSW.want=false;exitFS();fx.classList.remove("show");setTimeout(updFsx,350);}
+    if(fx){fx.addEventListener("touchend",function(e){e.preventDefault();e.stopPropagation();closeFS();},{passive:false});fx.addEventListener("click",function(e){e.stopPropagation();closeFS();});}
+  })();}
   /* ===== RADIO (ahuyenta a la Mantis 15s) ===== */
   function makeHandRadio(){var g=new THREE.Group(),bodyM=new THREE.MeshStandardMaterial({map:METALTEX,color:0x17231e,roughness:.48,metalness:.5}),rubber=new THREE.MeshStandardMaterial({color:0x050706,roughness:.72}),glow=new THREE.MeshStandardMaterial({color:0x173d25,emissive:0x5dff7a,emissiveIntensity:1.8});var body=new THREE.Mesh(new THREE.BoxGeometry(.3,.48,.13),bodyM);g.add(body);var top=new THREE.Mesh(new THREE.BoxGeometry(.24,.08,.12),rubber);top.position.y=.28;g.add(top);var ant=new THREE.Mesh(new THREE.CylinderGeometry(.012,.018,.48,8),rubber);ant.position.set(.1,.52,0);ant.rotation.z=-.08;g.add(ant);var screen=new THREE.Mesh(new THREE.PlaneGeometry(.2,.095),glow);screen.position.set(0,.12,.071);g.add(screen);for(var y=0;y<4;y++)for(var x=-1;x<=1;x++){var hole=new THREE.Mesh(new THREE.SphereGeometry(.012,6,5),rubber);hole.position.set(x*.05,-.04-y*.045,.071);g.add(hole);}var button=new THREE.Mesh(new THREE.CylinderGeometry(.035,.035,.025,12),new THREE.MeshStandardMaterial({color:0x7b1720,emissive:0xff2638,emissiveIntensity:.6}));button.rotation.x=Math.PI/2;button.position.set(.1,.22,.08);g.add(button);var hand=new THREE.Mesh(new THREE.SphereGeometry(.13,14,10),rubber);hand.scale.set(1.1,.85,1.45);hand.position.set(-.04,-.31,.05);g.add(hand);g.scale.set(.9,.9,.9);g.visible=false;return {g:g,screen:screen,button:button};}
   var radioRig=makeHandRadio();camera.add(radioRig.g);var RADIO={on:false,t:0,cool:0,src:null,gain:null,noiseSrc:null,used:{1:false,444:false,555:false},hand:0};
@@ -614,7 +634,7 @@ window.addEventListener("error",function(ev){if(window.__mantisBooted)return;var
 
   function startGame(){initAudio();$("#start").classList.add("hidden");$("#dead").classList.add("hidden");$("#win").classList.add("hidden");$("#hud").classList.remove("hidden");started=true;gameOver=false;paused=false;
     if(IS_TOUCH){keys={};var tc=$("#tCrouch");if(tc)tc.classList.remove("act");$("#touchui").classList.remove("hidden");$("#pausemsg").textContent="Pausa — toca para continuar";
-      try{var de=document.documentElement;if(!document.fullscreenElement&&de.requestFullscreen){var fp=de.requestFullscreen();if(fp&&fp.catch)fp.catch(function(){});}}catch(e){}
+      FSW.want=true;goFS();
       try{if(screen.orientation&&screen.orientation.lock){var op=screen.orientation.lock("landscape");if(op&&op.catch)op.catch(function(){});}}catch(e){}}
     try{if(AU.ctx&&AU.ctx.state==="suspended")AU.ctx.resume();}catch(e){}
     reset();if(!IS_TOUCH)reqLock();}
@@ -825,7 +845,7 @@ window.addEventListener("error",function(ev){if(window.__mantisBooted)return;var
   setCols();animate();setTimeout(prewarm,350);
   window.__MDBG={pool:POOL,vl:VLIGHTS,go:goTo,scene:scene,renderer:renderer,pl:PL,eco:ECO,layerOf:function(){return layer},start:startGame};
   window.__mantisBooted=true;
-  (function(){var bl=document.getElementById("bootline");if(bl){bl.textContent="MOTOR CARGADO ✓ · v3.2.2 · "+(IS_TOUCH?"MODO TÁCTIL":"MODO ESCRITORIO");bl.style.color="#4f8a63";}})();
+  (function(){var bl=document.getElementById("bootline");if(bl){bl.textContent="MOTOR CARGADO ✓ · v3.2.3 · "+(IS_TOUCH?"MODO TÁCTIL":"MODO ESCRITORIO");bl.style.color="#4f8a63";}})();
 })();
 </script>
 </body>
